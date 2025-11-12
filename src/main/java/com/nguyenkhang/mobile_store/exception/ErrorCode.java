@@ -22,11 +22,15 @@ public enum ErrorCode {
     INVALID_CREDENTIALS(1117, "Invalid username or password!", HttpStatus.UNAUTHORIZED),
     ROLE_EXISTED(1118, "Role existed!", HttpStatus.BAD_REQUEST),
     BRAND_NOT_EXISTED(1119, "Brand not existed!", HttpStatus.BAD_REQUEST),
-    SIZE_NOT_EXISTED(1120, "Size not existed!", HttpStatus.BAD_REQUEST),
-    COLOR_NOT_EXISTED(1121, "Color not existed!", HttpStatus.BAD_REQUEST),
     INVALID_PHONE_NUMBER(1122, "Invalid phone number (must start with 0 or +84 and be 10 digits)", HttpStatus.BAD_REQUEST),
     PHONE_NUMBER_REQUIRED(1123, "Phone number  is required!", HttpStatus.BAD_REQUEST),
     PHONE_NUMBER_EXISTED(1124, "Phone number existed!", HttpStatus.BAD_REQUEST),
+
+    BRAND_NAME_REQUIRED(1123, "Brand name is required!", HttpStatus.BAD_REQUEST),
+    DESCRIPTION_REQUIRED(1501, "Description is required!", HttpStatus.BAD_REQUEST),
+
+    CATEGORY_NAME_REQUIRED(1123, "Category name is required!", HttpStatus.BAD_REQUEST),
+
 
     INVALID_EMAIL(1122, "Invalid email!", HttpStatus.BAD_REQUEST),
     EMAIL_REQUIRED(1123, "Email is required!", HttpStatus.BAD_REQUEST),
@@ -147,6 +151,14 @@ public enum ErrorCode {
 
 
     PAYMENT_NOT_EXISTED(4653, "Payment not existed! ", HttpStatus.BAD_REQUEST),
+
+    PRICE_REQUIRED(1509, "Price is required!", HttpStatus.BAD_REQUEST),
+    PRICE_INVALID(1509, "Price must be a number and greater than 0!", HttpStatus.BAD_REQUEST),
+    WAREHOUSE_REQUIRED(9294, "Warehouse is required!", HttpStatus.BAD_REQUEST),
+    SUPPLIER_REQUIRED(9294, "Supplier is required!", HttpStatus.BAD_REQUEST),
+
+    TOTAL_PRICE_INVALID(1509, "Total price must be a number and greater than 0!", HttpStatus.BAD_REQUEST),
+    TOTAL_PRICE_REQUIRED(1509, "Total price is required!", HttpStatus.BAD_REQUEST),
 
     ;
 

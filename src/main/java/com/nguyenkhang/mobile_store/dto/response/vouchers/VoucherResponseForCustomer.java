@@ -31,11 +31,4 @@ public class VoucherResponseForCustomer {
     LocalDateTime startDate;
     LocalDateTime endDate;
 
-
-    UserResponse createBy;
-    UserResponse updateBy;
-
-    LocalDateTime createAt;
-    LocalDateTime updateAt;
-
 }

@@ -28,6 +28,7 @@ public class WarehouseRequest {
     @NotBlank(message = "WARD_REQUIRED")
     String ward;
 
+    @NotBlank(message = "DESCRIPTION_REQUIRED")
     String description;
 
 }

@@ -66,7 +66,7 @@ public class OrderService {
         String name = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         Customer customer = customerRepository.findById(request.getCustomerId()).orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_NOT_EXISTED));
-        Voucher voucher = voucherRepository.findById(request.getVoucherId()).orElse(null);
+        Voucher voucher = voucherRepository.findByVoucherCode(request.getVoucherCode()).orElse(null);
 
         Set<Long> variantIds = request.getOrderItems().stream().map(OrderItemRequest::getProductVariantId).collect(Collectors.toSet());
 

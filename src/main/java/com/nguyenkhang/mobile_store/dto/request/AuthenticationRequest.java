@@ -10,8 +10,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(
         level =
                 AccessLevel
-                        .PRIVATE) // tat ca field trong class se mac dinh la private va khong can dung private truoc cac
-// field nua
+                        .PRIVATE)
 public class AuthenticationRequest {
     String username;
     String password;

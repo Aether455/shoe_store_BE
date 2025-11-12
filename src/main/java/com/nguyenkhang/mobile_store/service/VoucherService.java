@@ -3,6 +3,7 @@ package com.nguyenkhang.mobile_store.service;
 import com.nguyenkhang.mobile_store.dto.request.VoucherRequest;
 import com.nguyenkhang.mobile_store.dto.response.SupplierResponse;
 import com.nguyenkhang.mobile_store.dto.response.vouchers.VoucherResponse;
+import com.nguyenkhang.mobile_store.dto.response.vouchers.VoucherResponseForCustomer;
 import com.nguyenkhang.mobile_store.entity.User;
 import com.nguyenkhang.mobile_store.entity.Voucher;
 import com.nguyenkhang.mobile_store.exception.AppException;
@@ -64,6 +65,12 @@ public class VoucherService {
         return voucherMapper.toVoucherResponse(voucher);
     }
 
+    public VoucherResponseForCustomer findByVoucherCode(String voucherCode) {
+        Voucher voucher = voucherRepository.findByVoucherCode(voucherCode).orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_EXISTED));
+
+        return voucherMapper.toVoucherResponseForCustomer(voucher);
+    }
+
     public VoucherResponse updateVoucher(long voucherId, VoucherRequest request) {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
@@ -86,5 +93,10 @@ public class VoucherService {
     public Page<VoucherResponse> searchVouchers(String keyword, int page){
         Pageable pageable = PageRequest.of(page, 20);
         return voucherRepository.findAll(VoucherSpecification.createSpecification(keyword), pageable).map(voucherMapper::toVoucherResponse);
+    }
+
+    public Page<VoucherResponseForCustomer> searchVouchersForUser(String keyword, int page){
+        Pageable pageable = PageRequest.of(page, 20);
+        return voucherRepository.findAll(VoucherSpecification.createSpecification(keyword), pageable).map(voucherMapper::toVoucherResponseForCustomer);
     }
 }

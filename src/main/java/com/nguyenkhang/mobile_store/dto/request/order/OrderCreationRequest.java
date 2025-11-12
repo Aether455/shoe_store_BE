@@ -39,7 +39,7 @@ public class OrderCreationRequest {
     @NotBlank(message = "WARD_REQUIRED")
     String ward;
 
-    long voucherId;
+    String voucherCode;
 
     PaymentRequest payment;
     List<OrderItemRequest> orderItems;
