@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.nguyenkhang.mobile_store.dto.response.user.SimpleUserResponse;
 
+import com.nguyenkhang.mobile_store.enums.OrderStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -23,7 +24,7 @@ public class SimpleOrderResponse {
 
     String shippingAddress;
 
-    String status;
+    OrderStatus status;
 
     String note;
 
@@ -36,7 +37,5 @@ public class SimpleOrderResponse {
     double finalAmount;
 
     LocalDateTime createAt;
-    LocalDateTime updateAt;
     SimpleUserResponse createBy;
-    SimpleUserResponse updateBy;
 }

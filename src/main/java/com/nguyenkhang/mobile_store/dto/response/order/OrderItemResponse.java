@@ -1,5 +1,6 @@
 package com.nguyenkhang.mobile_store.dto.response.order;
 
+import com.nguyenkhang.mobile_store.dto.response.product.SimpleProductResponseForUsing;
 import jakarta.persistence.*;
 
 import com.nguyenkhang.mobile_store.dto.response.product.SimpleProductResponse;
@@ -18,7 +19,7 @@ public class OrderItemResponse {
 
     Long id;
 
-    SimpleProductResponse product;
+    SimpleProductResponseForUsing product;
 
     SimpleProductVariantResponse productVariant;
 

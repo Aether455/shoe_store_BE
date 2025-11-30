@@ -1,5 +1,6 @@
 package com.nguyenkhang.mobile_store.service;
 
+import com.nguyenkhang.mobile_store.dto.request.StaffUpdateRequest;
 import org.springframework.data.domain.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,6 +30,7 @@ public class StaffService {
     StaffMapper staffMapper;
 
     UserRepository userRepository;
+    UserService userService;
 
     @Transactional
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -36,10 +38,7 @@ public class StaffService {
         if (staffRepository.existsByPhoneNumber(request.getPhoneNumber())) {
             throw new AppException(ErrorCode.PHONE_NUMBER_EXISTED);
         }
-        var context = SecurityContextHolder.getContext();
-        String name = context.getAuthentication().getName();
-        User userCreate =
-                userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User userCreate = userService.getCurrentUser();
         User user = userRepository
                 .findById(request.getUserId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
@@ -69,11 +68,8 @@ public class StaffService {
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public StaffResponse update(Long staffId, StaffRequest request) {
-        var context = SecurityContextHolder.getContext();
-        String name = context.getAuthentication().getName();
-        User userUpdate =
-                userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+    public StaffResponse update(Long staffId, StaffUpdateRequest request) {
+        User userUpdate = userService.getCurrentUser();
 
         Staff staff =
                 staffRepository.findById(staffId).orElseThrow(() -> new AppException(ErrorCode.STAFF_NOT_EXISTED));
@@ -87,8 +83,8 @@ public class StaffService {
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public Page<StaffResponse> searchStaffs(String keyword, int page) {
-        Pageable pageable = PageRequest.of(page, 20);
+    public Page<StaffResponse> searchStaffs(String keyword, int page,int size) {
+        Pageable pageable = PageRequest.of(page, size);
         return staffRepository
                 .findAll(StaffSpecification.createSpecification(keyword), pageable)
                 .map(staffMapper::toStaffResponse);

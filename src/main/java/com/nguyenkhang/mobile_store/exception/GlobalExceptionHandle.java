@@ -51,6 +51,7 @@ public class GlobalExceptionHandle {
 
         String enumKey = exception.getFieldError().getDefaultMessage();
 
+
         Map<String, Object> attributes = null;
         ErrorCode errorCode;
         try {
@@ -63,6 +64,9 @@ public class GlobalExceptionHandle {
             attributes = constraintViolation.getConstraintDescriptor().getAttributes();
             log.info(attributes.toString());
         } catch (IllegalArgumentException ignored) {
+            log.error("Error: ", ignored);
+
+            log.error(enumKey);
             errorCode = ErrorCode.INVALID_KEY;
         }
         ApiResponse apiResponse = new ApiResponse();

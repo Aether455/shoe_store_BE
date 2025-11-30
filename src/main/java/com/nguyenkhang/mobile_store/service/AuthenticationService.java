@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.StringJoiner;
 import java.util.UUID;
 
+import com.nguyenkhang.mobile_store.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -130,7 +131,7 @@ public class AuthenticationService {
     }
 
     @Async
-    @Scheduled(cron = "0 0 0 *  * ?")
+    @Scheduled(cron = "1 0 0 *  * ?")
     public void autoRemoveExpireInvalidatedToken() {
         Date date = new Date();
         var invalidatedTokens =

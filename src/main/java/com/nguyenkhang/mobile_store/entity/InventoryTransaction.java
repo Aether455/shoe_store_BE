@@ -29,6 +29,11 @@ public class InventoryTransaction {
     Warehouse warehouse;
 
     @ManyToOne
+    @JoinColumn(name = "product_id")
+    Product product;
+
+
+    @ManyToOne
     @JoinColumn(name = "product_variant_id")
     ProductVariant productVariant;
 

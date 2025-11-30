@@ -1,5 +1,8 @@
 package com.nguyenkhang.mobile_store.controller;
 
+import com.nguyenkhang.mobile_store.dto.request.InventoryCriteria;
+import com.nguyenkhang.mobile_store.dto.request.products.ProductSearchCriteria;
+import com.nguyenkhang.mobile_store.dto.response.product.SimpleProductResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +35,17 @@ public class InventoryController {
     public ApiResponse<InventoryResponse> getById(@PathVariable long id) {
         return ApiResponse.<InventoryResponse>builder()
                 .result(inventoryService.getById(id))
+                .build();
+    }
+
+    @GetMapping("/search")
+    public ApiResponse<Page<InventoryResponse>> search(
+            InventoryCriteria criteria,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        return ApiResponse.<Page<InventoryResponse>>builder()
+                .result(inventoryService.search(criteria,page,size))
                 .build();
     }
 }

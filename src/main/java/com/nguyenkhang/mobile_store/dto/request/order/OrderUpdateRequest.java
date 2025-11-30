@@ -19,4 +19,13 @@ public class OrderUpdateRequest {
 
     @NotBlank(message = "SHIPPING_ADDRESS_REQUIRED")
     String shippingAddress;
+
+    @NotBlank(message = "PROVINCE_REQUIRED")
+    String province;
+
+    @NotBlank(message = "DISTRICT_REQUIRED")
+    String district;
+
+    @NotBlank(message = "WARD_REQUIRED")
+    String ward;
 }

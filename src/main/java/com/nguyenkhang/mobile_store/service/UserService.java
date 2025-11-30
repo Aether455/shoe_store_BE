@@ -5,6 +5,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import com.nguyenkhang.mobile_store.dto.request.user.*;
+import com.nguyenkhang.mobile_store.dto.response.user.*;
+import com.nguyenkhang.mobile_store.repository.StaffRepository;
+import com.nguyenkhang.mobile_store.specification.WarehouseSpecification;
 import jakarta.persistence.EntityManager;
 
 import org.hibernate.exception.ConstraintViolationException;
@@ -12,19 +16,13 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.nguyenkhang.mobile_store.dto.request.user.UserCreationRequest;
-import com.nguyenkhang.mobile_store.dto.request.user.UserCreationRequestForCustomer;
-import com.nguyenkhang.mobile_store.dto.request.user.UserCreationRequestForStaff;
-import com.nguyenkhang.mobile_store.dto.request.user.UserUpdateRequest;
-import com.nguyenkhang.mobile_store.dto.response.user.UserResponse;
-import com.nguyenkhang.mobile_store.dto.response.user.UserResponseForCustomer;
-import com.nguyenkhang.mobile_store.dto.response.user.UserResponseForStaff;
 import com.nguyenkhang.mobile_store.entity.Customer;
 import com.nguyenkhang.mobile_store.entity.Staff;
 import com.nguyenkhang.mobile_store.entity.User;
@@ -46,12 +44,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserService {
+    private final StaffRepository staffRepository;
     PasswordEncoder passwordEncoder;
     UserRepository userRepository;
     RoleRepository roleRepository;
     UserMapper userMapper;
 
     EntityManager entityManager;
+
 
     @Transactional
     public UserResponse createUser(UserCreationRequest request) {
@@ -104,9 +104,13 @@ public class UserService {
 
     @Transactional
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public UserResponseForStaff createUserForStaff(UserCreationRequestForStaff request) {
+    public UserResponse createUserForStaff(UserCreationRequestForStaff request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+
+        if (staffRepository.existsByPhoneNumber(request.getPhoneNumber())){
+            throw  new AppException(ErrorCode.PHONE_NUMBER_EXISTED);
         }
         User user = userMapper.toUserForStaff(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -131,12 +135,13 @@ public class UserService {
         } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.USER_EXISTED);
         }
-        return userMapper.toUserResponseForStaff(user);
+        return userMapper.toUserResponse(user);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public List<UserResponse> getUsers() {
-        return userRepository.findAll().stream().map(userMapper::toUserResponse).collect(Collectors.toList());
+    public Page<UserResponse> getUsers(int page, int size, String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        return userRepository.findAll(pageable).map(userMapper::toUserResponse);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -155,8 +160,6 @@ public class UserService {
         }
 
         userMapper.updateUser(user, userUpdateRequest);
-
-        user.setPassword(passwordEncoder.encode(userUpdateRequest.getPassword()));
 
         var roles = roleRepository.findAllById(userUpdateRequest.getRoles());
         user.setRoles(new HashSet<>(roles));
@@ -177,6 +180,34 @@ public class UserService {
         } catch (ConstraintViolationException e) {
             throw new AppException(ErrorCode.USER_CAN_NOT_DELETE);
         }
+    }
+
+    public SimpleUserInfoResponse getMyInfo(){
+        var currentUser = getCurrentUser();
+
+        return userMapper.toSimpleUserInfoResponse(currentUser);
+    }
+
+    @Transactional
+    public SimpleUserResponse changePassword( UserChangePasswordRequest request){
+        var currentUser = getCurrentUser();
+
+        var authenticated = passwordEncoder.matches(request.getPassword(),currentUser.getPassword());
+
+        if (!authenticated){
+            throw new AppException(ErrorCode.INVALID_OLD_PASSWORD);
+        }
+        var validateNewPassword = request.getNewPassword().trim().equals(request.getConfirmationPassword());
+
+        if (!validateNewPassword){
+            throw new AppException(ErrorCode.CONFIRM_PASSWORD_NOT_MATCH);
+        }
+
+        currentUser.setPassword(passwordEncoder.encode(request.getNewPassword()));
+
+        currentUser =  userRepository.save(currentUser);
+
+        return userMapper.toSimpleUserResponse(currentUser);
     }
 
     public User getCurrentUser() {

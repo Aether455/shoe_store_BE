@@ -23,6 +23,9 @@ public enum ErrorCode {
     USER_NOT_EXISTED(1116, "User not existed!", HttpStatus.BAD_REQUEST),
     USER_CAN_NOT_DELETE(1116, "User can not delete!", HttpStatus.BAD_REQUEST),
     INVALID_CREDENTIALS(1117, "Invalid username or password!", HttpStatus.UNAUTHORIZED),
+    INVALID_OLD_PASSWORD(1117, "Invalid old password!", HttpStatus.UNAUTHORIZED),
+    CONFIRM_PASSWORD_NOT_MATCH(1117, "New password and confirm password don't match!!", HttpStatus.BAD_REQUEST),
+
     ROLE_EXISTED(1118, "Role existed!", HttpStatus.BAD_REQUEST),
     BRAND_NOT_EXISTED(1119, "Brand not existed!", HttpStatus.BAD_REQUEST),
     INVALID_PHONE_NUMBER(
@@ -39,6 +42,7 @@ public enum ErrorCode {
     EMAIL_REQUIRED(1123, "Email is required!", HttpStatus.BAD_REQUEST),
 
     CATEGORY_NOT_EXISTED(1125, "Category not existed!", HttpStatus.BAD_REQUEST),
+    CATEGORY_EXISTED(1125, "Category already existed!", HttpStatus.BAD_REQUEST),
 
     VOUCHER_NAME_REQUIRED(1200, "Voucher name is required!", HttpStatus.BAD_REQUEST),
     VOUCHER_CODE_REQUIRED(1201, "Voucher code is required!", HttpStatus.BAD_REQUEST),
@@ -55,6 +59,7 @@ public enum ErrorCode {
     SALARY_INVALID(1303, "Salary must be greater than 0!", HttpStatus.BAD_REQUEST),
     USER_NOT_BLANK(1303, "User must not be left blank!", HttpStatus.BAD_REQUEST),
     STAFF_NOT_EXISTED(1303, "Staff not existed!", HttpStatus.BAD_REQUEST),
+    GENDER_REQUIRED(1200, "Gender is required!", HttpStatus.BAD_REQUEST),
 
     ADDRESS_REQUIRED(1400, "Address is required!", HttpStatus.BAD_REQUEST),
     CUSTOMER_ID_REQUIRED(1401, "Customer id is required!", HttpStatus.BAD_REQUEST),
@@ -77,6 +82,9 @@ public enum ErrorCode {
 
     PRODUCT_REQUIRED(1509, "Product is required!", HttpStatus.BAD_REQUEST),
     PRODUCT_VARIANT_REQUIRED(1508, "Product variant is required!", HttpStatus.BAD_REQUEST),
+    VARIANT_IMAGE_FILE_REQUIRED(1508, "Variant image is required!", HttpStatus.BAD_REQUEST),
+    MAIN_IMAGE_FILE_REQUIRED(1508, "Product main image is required!", HttpStatus.BAD_REQUEST),
+
 
     PRODUCT_PRICE_INVALID(1509, "Product variant price must be a number and greater than 0!", HttpStatus.BAD_REQUEST),
     PRODUCT_PRICE_REQUIRED(1509, "Product variant price is required!", HttpStatus.BAD_REQUEST),

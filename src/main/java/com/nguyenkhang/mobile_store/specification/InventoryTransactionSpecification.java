@@ -16,16 +16,16 @@ public class InventoryTransactionSpecification {
 
             String likePattern = "%" + keyword + "%";
 
-            Join<InventoryTransaction, User> userJoin = root.join("user", jakarta.persistence.criteria.JoinType.LEFT);
-            Join<InventoryTransaction, Supplier> supplierJoin = root.join("supplier", JoinType.LEFT);
+            Join<InventoryTransaction, User> userJoin = root.join("createBy", jakarta.persistence.criteria.JoinType.LEFT);
+            Join<InventoryTransaction, Product> productJoin = root.join("product", JoinType.LEFT);
             Join<InventoryTransaction, Warehouse> warehouseJoin = root.join("warehouse", JoinType.LEFT);
 
             Predicate usernameLike = criteriaBuilder.like(userJoin.get("username"), likePattern);
 
-            Predicate supplierNameLike = criteriaBuilder.like(supplierJoin.get("name"), likePattern);
+            Predicate productNameLike = criteriaBuilder.like(productJoin.get("name"), likePattern);
             Predicate warehouseNameLike = criteriaBuilder.like(warehouseJoin.get("name"), likePattern);
 
-            return criteriaBuilder.or(supplierNameLike, warehouseNameLike, usernameLike);
+            return criteriaBuilder.or(productNameLike, warehouseNameLike, usernameLike);
         });
     }
 }

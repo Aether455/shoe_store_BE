@@ -1,17 +1,12 @@
 package com.nguyenkhang.mobile_store.dto.response.product;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import com.nguyenkhang.mobile_store.dto.response.brand.BrandResponse;
 import com.nguyenkhang.mobile_store.dto.response.brand.SimpleBrandResponse;
-import com.nguyenkhang.mobile_store.dto.response.category.CategoryResponse;
 import com.nguyenkhang.mobile_store.dto.response.category.SimpleCategoryResponse;
-import com.nguyenkhang.mobile_store.dto.response.product_variant.ProductVariantResponse;
 import com.nguyenkhang.mobile_store.dto.response.user.SimpleUserResponse;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -19,27 +14,15 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductResponse {
+public class SimpleProductResponseForUsing {
 
     Long id;
 
     String name;
-
-    String description;
-
     String mainImageUrl;
-
-    List<ProductVariantResponse> productVariants;
 
     SimpleCategoryResponse category;
 
     SimpleBrandResponse brand;
 
-    SimpleUserResponse createBy;
-
-    SimpleUserResponse updateBy;
-
-    LocalDateTime createAt;
-
-    LocalDateTime updateAt;
 }

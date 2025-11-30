@@ -2,6 +2,7 @@ package com.nguyenkhang.mobile_store.dto.response;
 
 import java.time.LocalDateTime;
 
+import com.nguyenkhang.mobile_store.dto.response.user.SimpleUserResponse;
 import com.nguyenkhang.mobile_store.dto.response.user.UserResponse;
 
 import lombok.*;
@@ -17,19 +18,23 @@ public class StaffResponse {
 
     Long id;
 
-    UserResponse user;
+    SimpleUserResponse user;
+
+    String fullName;
 
     String phoneNumber;
 
     String position;
 
+    String gender;
+
     LocalDateTime hireDate;
 
     double salary;
 
-    UserResponse createBy;
+    SimpleUserResponse createBy;
 
-    UserResponse updateBy;
+    SimpleUserResponse updateBy;
 
     LocalDateTime createAt;
 

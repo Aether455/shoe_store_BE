@@ -1,4 +1,4 @@
-package com.nguyenkhang.mobile_store.dto.response.product;
+package com.nguyenkhang.mobile_store.dto.request.products;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

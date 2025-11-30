@@ -2,6 +2,7 @@ package com.nguyenkhang.mobile_store.dto.response.order;
 
 import java.time.LocalDateTime;
 
+import com.nguyenkhang.mobile_store.dto.response.user.SimpleUserResponse;
 import com.nguyenkhang.mobile_store.dto.response.user.UserResponse;
 
 import lombok.*;
@@ -20,7 +21,7 @@ public class OrderStatusHistoryResponse {
     String oldStatus;
     String newStatus;
 
-    UserResponse changeBy;
+    SimpleUserResponse changeBy;
 
     LocalDateTime changeAt;
 }

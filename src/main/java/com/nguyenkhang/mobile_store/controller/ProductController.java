@@ -1,7 +1,6 @@
 package com.nguyenkhang.mobile_store.controller;
 
-import com.nguyenkhang.mobile_store.dto.response.product.ProductSearchCriteria;
-import com.nguyenkhang.mobile_store.dto.response.product.SimpleProductSearchResponse;
+import com.nguyenkhang.mobile_store.dto.request.products.ProductSearchCriteria;
 import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Page;

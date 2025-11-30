@@ -1,15 +1,12 @@
 package com.nguyenkhang.mobile_store.specification;
 
-import com.nguyenkhang.mobile_store.dto.response.product.ProductSearchCriteria;
-import com.nguyenkhang.mobile_store.entity.Customer;
+import com.nguyenkhang.mobile_store.dto.request.products.ProductSearchCriteria;
 import com.nguyenkhang.mobile_store.entity.Product;
 import com.nguyenkhang.mobile_store.entity.ProductVariant;
-import com.nguyenkhang.mobile_store.entity.User;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

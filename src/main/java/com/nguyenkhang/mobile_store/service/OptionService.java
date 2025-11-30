@@ -2,6 +2,7 @@ package com.nguyenkhang.mobile_store.service;
 
 import java.util.List;
 
+import com.nguyenkhang.mobile_store.dto.response.option.SimpleOptionResponse;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,13 @@ public class OptionService {
     public List<OptionResponse> getAll() {
         return optionRepository.findAll().stream()
                 .map(optionMapper::toOptionResponse)
+                .toList();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
+    public List<SimpleOptionResponse> getAllForUsing() {
+        return optionRepository.findAll().stream()
+                .map(optionMapper::toSimpleOptionResponse)
                 .toList();
     }
 

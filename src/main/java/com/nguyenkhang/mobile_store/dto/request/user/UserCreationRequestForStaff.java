@@ -20,6 +20,8 @@ public class UserCreationRequestForStaff {
     @Size(min = 8, message = "INVALID_PASSWORD")
     String password;
 
+    String gender;
+
     @NotBlank(message = "EMAIL_REQUIRED")
     @Email(message = "INVALID_EMAIL")
     String email;

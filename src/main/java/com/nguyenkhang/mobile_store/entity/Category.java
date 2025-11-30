@@ -23,7 +23,7 @@ public class Category {
     @Column(nullable = false)
     Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     String name;
 
     @Column(columnDefinition = "TEXT")

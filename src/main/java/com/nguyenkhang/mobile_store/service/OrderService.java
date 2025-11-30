@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.nguyenkhang.mobile_store.dto.response.order.OrderResponseForCustomer;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -62,13 +63,14 @@ public class OrderService {
     UserService userService;
     GeocodingService geocodingService;
 
-    @Transactional
+    @Transactional //  bỏ qua
     public OrderResponse createOrder(OrderCreationRequest request) {
 
-        String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        User user = userService.getCurrentUser();
+
         Customer customer = customerRepository
-                .findById(request.getCustomerId())
+                .findByUserId(user.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_NOT_EXISTED));
         Voucher voucher =
                 voucherRepository.findByVoucherCode(request.getVoucherCode()).orElse(null);
@@ -106,6 +108,75 @@ public class OrderService {
         order.setOrderItems(orderItemList);
         order.setUser(user);
         order.setCustomer(customer);
+        order.setStatus(OrderStatus.PENDING);
+        order.setVoucher(voucher);
+        order.setOrderCode(generateOrderCode());
+        calculateAmount(order);
+        try {
+
+            Coordinates coordinates =
+                    geocodingService.getCoordinates(request.getWard(), request.getDistrict(), request.getProvince());
+
+            if (coordinates != null) {
+                order.setDeliveryLatitude(coordinates.getLatitude());
+                order.setDeliveryLongitude(coordinates.getLongitude());
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+        Payment payment = paymentMapper.toPayment(request.getPayment());
+
+        payment.setAmount(order.getFinalAmount());
+        payment.setOrder(order);
+        order.setPayment(payment);
+
+        try {
+            order = orderRepository.save(order);
+        } catch (DataIntegrityViolationException e) {
+            log.error("Error in create order: ", e);
+            throw new AppException(ErrorCode.ORDER_CREATE_FAIL);
+        }
+
+        return orderMapper.toOrderResponse(order);
+    }
+
+    @Transactional
+    public OrderResponse createOrderForAdmin(OrderCreationRequest request) {
+
+        Voucher voucher =
+                voucherRepository.findByVoucherCode(request.getVoucherCode()).orElse(null);
+
+        Set<Long> variantIds = request.getOrderItems().stream()
+                .map(OrderItemRequest::getProductVariantId)
+                .collect(Collectors.toSet());
+
+        Map<Long, ProductVariant> productVariantMap = variantRepository.findAllById(variantIds).stream()
+                .collect(Collectors.toMap(ProductVariant::getId, Function.identity()));
+
+        List<OrderItem> orderItemList = new ArrayList<>();
+
+        Order order = orderMapper.toOrder(request);
+
+        for (var itemRequest : request.getOrderItems()) {
+            var variant = productVariantMap.get(itemRequest.getProductVariantId());
+            int quantityToBuy = itemRequest.getQuantity();
+
+            if (variant == null) {
+                throw new AppException(ErrorCode.PRODUCT_VARIANT_NOT_EXISTED);
+            }
+
+            if (variant.getQuantity() < quantityToBuy) {
+                throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+            }
+
+            var orderItem = orderMapper.toOrderItem(itemRequest);
+            orderItem.setOrder(order);
+            orderItem.setProduct(variant.getProduct());
+            orderItem.setProductVariant(variant);
+            orderItemList.add(orderItem);
+        }
+
+        order.setOrderItems(orderItemList);
         order.setStatus(OrderStatus.PENDING);
         order.setVoucher(voucher);
         order.setOrderCode(generateOrderCode());
@@ -280,19 +351,23 @@ public class OrderService {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
-    public Page<OrderResponse> getOrders(int page, int size, String sortBy) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+    public Page<SimpleOrderResponse> getOrders(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         var order = orderRepository.findAll(pageable);
 
-        return order.map(orderMapper::toOrderResponse);
+        return order.map(orderMapper::toSimpleOrderResponse);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public OrderResponse getOrderById(long id) {
         var order = orderRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_EXIST));
-        log.info("Order Item {}", order.getOrderItems());
-
         return orderMapper.toOrderResponse(order);
+    }
+
+    public OrderResponseForCustomer getOrderByIdForCustomer(long id) {
+        var order = orderRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_EXIST));
+
+        return orderMapper.toOrderResponseForCustomer(order);
     }
 
     public Page<SimpleOrderResponseForCustomer> getMyOrders(int page, int size, String sortBy) {
@@ -305,8 +380,8 @@ public class OrderService {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
-    public Page<SimpleOrderResponse> searchOrders(String keyword, int page) {
-        Pageable pageable = PageRequest.of(page, 20);
+    public Page<SimpleOrderResponse> searchOrders(String keyword, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         return orderRepository
                 .findAll(OrderSpecification.createSpecification(keyword), pageable)
                 .map(orderMapper::toSimpleOrderResponse);
@@ -375,6 +450,51 @@ public class OrderService {
                         .createBy(user)
                         .quantityChange(+item.getQuantity())
                         .type(InventoryReferenceType.CANCEL_ORDER_RETURN)
+                        .note("Return by cancel Order" + order.getOrderCode())
+                        .referenceId(order.getId())
+                        .build();
+                inventoryTransactionsToCreate.add(inventoryTransaction);
+            }
+        }
+        if (request.getOrderStatus().equals(OrderStatus.CONFIRMED)) {
+            Set<Long> variantIds = order.getOrderItems().stream()
+                    .map((item) -> item.getProductVariant().getId())
+                    .collect(Collectors.toSet());
+
+            Map<Long, ProductVariant> productVariantMap = variantRepository.findAllById(variantIds).stream()
+                    .collect(Collectors.toMap(ProductVariant::getId, Function.identity()));
+
+            Map<Long, Inventory> inventoryMap =
+                    inventoryRepository
+                            .findByWarehouseIdAndProductVariant_IdIn(
+                                    order.getWarehouse().getId(), variantIds)
+                            .stream()
+                            .collect(Collectors.toMap(
+                                    (inventory) -> inventory.getProductVariant().getId(), Function.identity()));
+
+            for (var item : order.getOrderItems()) {
+                Long variantId = item.getProductVariant().getId();
+                int quantityToBuy = item.getQuantity();
+
+                var variant = productVariantMap.get(variantId);
+
+                Inventory inventory = inventoryMap.get(variantId);
+
+                // trừ kho đơn lẻ
+                inventory.setQuantity(inventory.getQuantity() - quantityToBuy);
+                inventoriesToUpdate.add(inventory);
+
+                // trừ tổng kho
+                variant.setQuantity(variant.getQuantity() - quantityToBuy);
+                variantToUpdate.add(variant);
+
+                // ghi ls giao dịch kho
+                InventoryTransaction inventoryTransaction = InventoryTransaction.builder()
+                        .warehouse(order.getWarehouse())
+                        .productVariant(variant)
+                        .createBy(user)
+                        .quantityChange(+item.getQuantity())
+                        .type(InventoryReferenceType.EXPORT_TO_CUSTOMER)
                         .note("Exports to Order" + order.getOrderCode())
                         .referenceId(order.getId())
                         .build();
@@ -389,7 +509,7 @@ public class OrderService {
             orderStatusHistoryRepository.save(history);
             inventoryTransactionRepository.saveAll(inventoryTransactionsToCreate);
         } catch (DataIntegrityViolationException e) {
-            log.error("Error in confirm order: ", e);
+            log.error("Error in update order status: ", e);
             throw new AppException(ErrorCode.ORDER_CREATE_FAIL);
         }
         return orderMapper.toOrderResponse(order);
@@ -413,7 +533,7 @@ public class OrderService {
         try {
             order = orderRepository.save(order);
         } catch (Exception e) {
-            log.error("Error when create order: ", e);
+            log.error("Error when update order: ", e);
             throw new RuntimeException(e);
         }
 

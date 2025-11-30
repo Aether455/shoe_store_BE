@@ -1,5 +1,6 @@
 package com.nguyenkhang.mobile_store.mapper;
 
+import com.nguyenkhang.mobile_store.dto.request.StaffUpdateRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
@@ -14,5 +15,5 @@ public interface StaffMapper {
 
     StaffResponse toStaffResponse(Staff staff);
 
-    void updateStaff(@MappingTarget Staff staff, StaffRequest request);
+    void updateStaff(@MappingTarget Staff staff, StaffUpdateRequest request);
 }

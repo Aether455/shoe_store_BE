@@ -24,10 +24,11 @@ public class VoucherController {
     VoucherService voucherService;
 
     @GetMapping
-    public ApiResponse<List<VoucherResponse>> getVouchers() {
-        return ApiResponse.<List<VoucherResponse>>builder()
-                .result(voucherService.getVouchers())
-                .message("Success!")
+    public ApiResponse<Page<VoucherResponse>> getVouchers( @RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size,
+                                                           @RequestParam(defaultValue = "id") String sortBy) {
+        return ApiResponse.<Page<VoucherResponse>>builder()
+                .result(voucherService.getVouchers(page,size,sortBy))
                 .build();
     }
 
@@ -35,7 +36,6 @@ public class VoucherController {
     public ApiResponse<VoucherResponse> create(@RequestBody @Valid VoucherRequest request) {
         return ApiResponse.<VoucherResponse>builder()
                 .result(voucherService.create(request))
-                .message("Success!")
                 .build();
     }
 
@@ -58,7 +58,6 @@ public class VoucherController {
     ApiResponse<String> delete(@PathVariable long voucherId) {
         voucherService.delete(voucherId);
         return ApiResponse.<String>builder()
-                .message("Success!")
                 .result("Voucher has been deleted")
                 .build();
     }

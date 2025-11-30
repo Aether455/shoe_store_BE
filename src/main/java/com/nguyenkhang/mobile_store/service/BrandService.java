@@ -22,6 +22,7 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BrandService {
+
     BrandMapper brandMapper;
     BrandRepository brandRepository;
 

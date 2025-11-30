@@ -60,5 +60,6 @@ public class PurchaseOrder {
     LocalDateTime createAt;
 
     @Version
-    Long version;
+    @Column(columnDefinition = "bigint default 0")
+    Long version = 0L;
 }

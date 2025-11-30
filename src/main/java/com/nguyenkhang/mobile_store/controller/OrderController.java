@@ -26,24 +26,23 @@ public class OrderController {
     OrderService orderService;
 
     @PostMapping
-    public ApiResponse<OrderResponse> createOrder(@RequestBody @Valid OrderCreationRequest request) {
+    public ApiResponse<OrderResponse> createOrderForAdmin(@RequestBody @Valid OrderCreationRequest request) {
         return ApiResponse.<OrderResponse>builder()
-                .result(orderService.createOrder(request))
+                .result(orderService.createOrderForAdmin(request))
                 .build();
     }
 
     @GetMapping
-    public ApiResponse<Page<OrderResponse>> getOrders(
+    public ApiResponse<Page<SimpleOrderResponse>> getOrders(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy) {
-        return ApiResponse.<Page<OrderResponse>>builder()
-                .result(orderService.getOrders(page, size, sortBy))
+            @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.<Page<SimpleOrderResponse>>builder()
+                .result(orderService.getOrders(page, size ))
                 .build();
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<OrderResponse> getOrders(@PathVariable long id) {
+    public ApiResponse<OrderResponse> getOrderById(@PathVariable long id) {
         return ApiResponse.<OrderResponse>builder()
                 .result(orderService.getOrderById(id))
                 .build();
@@ -64,35 +63,11 @@ public class OrderController {
                 .build();
     }
 
-    @PatchMapping("/{id}/confirm")
-    public ApiResponse<OrderResponse> confirmOrder(@PathVariable long id) {
-        return ApiResponse.<OrderResponse>builder()
-                .result(orderService.confirmOrder(id))
-                .build();
-    }
-
-    @PatchMapping("/{id}/cancel")
-    public ApiResponse<OrderResponse> cancelOrder(@PathVariable long id) {
-        return ApiResponse.<OrderResponse>builder()
-                .result(orderService.cancelOrder(id))
-                .build();
-    }
-
-    @GetMapping("/me")
-    public ApiResponse<Page<SimpleOrderResponseForCustomer>> getMyOrders(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id") String sortBy) {
-        return ApiResponse.<Page<SimpleOrderResponseForCustomer>>builder()
-                .result(orderService.getMyOrders(page, size, sortBy))
-                .build();
-    }
-
     @GetMapping("/search")
     public ApiResponse<Page<SimpleOrderResponse>> searchOrders(
-            @RequestParam(defaultValue = "0") int page, @RequestParam String keyword) {
+            @RequestParam(defaultValue = "0") int page, @RequestParam String keyword,   @RequestParam(defaultValue = "10") int size) {
         return ApiResponse.<Page<SimpleOrderResponse>>builder()
-                .result(orderService.searchOrders(keyword, page))
+                .result(orderService.searchOrders(keyword, page,size))
                 .build();
     }
 }

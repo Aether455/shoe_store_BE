@@ -1,5 +1,10 @@
 package com.nguyenkhang.mobile_store.service;
 
+import com.nguyenkhang.mobile_store.dto.request.InventoryCriteria;
+import com.nguyenkhang.mobile_store.dto.request.products.ProductSearchCriteria;
+import com.nguyenkhang.mobile_store.dto.response.product.SimpleProductResponse;
+import com.nguyenkhang.mobile_store.specification.InventorySpecification;
+import com.nguyenkhang.mobile_store.specification.ProductSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,5 +43,16 @@ public class InventoryService {
         var inventory =
                 inventoryRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.INVENTORY_NOT_EXISTED));
         return inventoryMapper.toInventoryResponse(inventory);
+    }
+
+    public Page<InventoryResponse> search(InventoryCriteria criteria, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+
+        var spec = InventorySpecification.createSpecification(criteria);
+
+        var products = inventoryRepository.findAll(spec,pageable);
+
+
+        return products.map(inventoryMapper::toInventoryResponse);
     }
 }

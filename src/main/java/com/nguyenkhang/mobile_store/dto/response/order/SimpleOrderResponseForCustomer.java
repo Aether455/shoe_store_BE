@@ -2,6 +2,7 @@ package com.nguyenkhang.mobile_store.dto.response.order;
 
 import java.time.LocalDateTime;
 
+import com.nguyenkhang.mobile_store.enums.OrderStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -21,7 +22,7 @@ public class SimpleOrderResponseForCustomer {
 
     String shippingAddress;
 
-    String status;
+    OrderStatus status;
 
     String note;
 

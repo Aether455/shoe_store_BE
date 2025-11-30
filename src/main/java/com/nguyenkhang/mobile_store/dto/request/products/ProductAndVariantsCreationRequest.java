@@ -23,7 +23,7 @@ public class ProductAndVariantsCreationRequest {
 
     @NotBlank(message = "PRODUCT_DESCRIPTION_NOT_BLANK")
     String description;
-
+    @NotNull(message = "MAIN_IMAGE_FILE_REQUIRED")
     MultipartFile mainImageFile;
 
     List<VariantCreationRequest> variants;

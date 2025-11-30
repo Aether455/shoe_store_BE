@@ -1,5 +1,10 @@
 package com.nguyenkhang.mobile_store.service;
 
+import com.nguyenkhang.mobile_store.dto.response.user.UserResponse;
+import com.nguyenkhang.mobile_store.specification.UserSpecification;
+import com.nguyenkhang.mobile_store.specification.WarehouseSpecification;
+import jakarta.persistence.EntityManager;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +41,8 @@ public class WarehouseService {
 
     UserService userService;
     GeocodingService geocodingService;
+
+    EntityManager entityManager;
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
@@ -89,7 +96,12 @@ public class WarehouseService {
 
         warehouse.setUpdateBy(user);
 
-        warehouse = warehouseRepository.save(warehouse);
+        try {
+            warehouse = warehouseRepository.save(warehouse);
+        } catch (DataIntegrityViolationException e) {
+            log.error("Error in create warehouse: ", e);
+            throw new AppException(ErrorCode.PRIORITY_ALREADY_EXISTED);
+        }
 
         return warehouseMapper.toWarehouseResponse(warehouse);
     }
@@ -104,5 +116,12 @@ public class WarehouseService {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long id) {
         warehouseRepository.deleteById(id);
+    }
+
+    public Page<WarehouseResponse> searchWarehouse(String keyword, int page,  int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return warehouseRepository
+                .findAll(WarehouseSpecification.createSpecification(keyword), pageable)
+                .map(warehouseMapper::toWarehouseResponse);
     }
 }

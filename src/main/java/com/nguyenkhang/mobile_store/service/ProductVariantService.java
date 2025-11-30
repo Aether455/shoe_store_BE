@@ -45,6 +45,8 @@ public class ProductVariantService {
     String CLOUDINARY_FOLDER = "products/variants";
 
 
+
+
     EntityManager entityManager;
 
     @Transactional

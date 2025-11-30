@@ -20,6 +20,7 @@ public class VariantCreationRequest {
     @NotBlank(message = "SKU_REQUIRED")
     String sku;
 
+    @NotNull(message = "VARIANT_IMAGE_FILE_REQUIRED")
     MultipartFile imageFile;
 
     @NotEmpty(message = "OPTION_VALUES_REQUIRED")

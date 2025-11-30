@@ -2,19 +2,14 @@ package com.nguyenkhang.mobile_store.controller;
 
 import java.util.List;
 
+import com.nguyenkhang.mobile_store.dto.request.user.*;
+import com.nguyenkhang.mobile_store.dto.response.user.*;
 import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import com.nguyenkhang.mobile_store.dto.ApiResponse;
-import com.nguyenkhang.mobile_store.dto.request.user.UserCreationRequest;
-import com.nguyenkhang.mobile_store.dto.request.user.UserCreationRequestForCustomer;
-import com.nguyenkhang.mobile_store.dto.request.user.UserCreationRequestForStaff;
-import com.nguyenkhang.mobile_store.dto.request.user.UserUpdateRequest;
-import com.nguyenkhang.mobile_store.dto.response.user.UserResponse;
-import com.nguyenkhang.mobile_store.dto.response.user.UserResponseForCustomer;
-import com.nguyenkhang.mobile_store.dto.response.user.UserResponseForStaff;
 import com.nguyenkhang.mobile_store.service.UserService;
 
 import lombok.AccessLevel;
@@ -36,7 +31,7 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/customers")
+    @PostMapping("/customers")/// dành cho khách hàng
     public ApiResponse<UserResponseForCustomer> createUserForCustomer(
             @RequestBody @Valid UserCreationRequestForCustomer request) {
 
@@ -45,24 +40,26 @@ public class UserController {
                 .build();
     }
 
-    @PostMapping("/staffs")
-    public ApiResponse<UserResponseForStaff> createUserForStaff(
+    @PostMapping("/staffs") //dành cho trang quản lý nhân viên
+    public ApiResponse<UserResponse> createUserForStaff(
             @RequestBody @Valid UserCreationRequestForStaff request) {
 
-        return ApiResponse.<UserResponseForStaff>builder()
+        return ApiResponse.<UserResponse>builder()
                 .result(userService.createUserForStaff(request))
                 .build();
     }
 
     @GetMapping
-    public ApiResponse<List<UserResponse>> getUsers() {
-        return ApiResponse.<List<UserResponse>>builder()
-                .result(userService.getUsers())
+    public ApiResponse<Page<UserResponse>> getUsers( @RequestParam(defaultValue = "0") int page,
+                                                     @RequestParam(defaultValue = "10") int size,
+                                                     @RequestParam(defaultValue = "id") String sortBy) {
+        return ApiResponse.<Page<UserResponse>>builder()
+                .result(userService.getUsers(page, size, sortBy))
                 .build();
     }
 
-    @GetMapping("/{userId}")
-    public ApiResponse<UserResponse> getUser(@PathVariable("userId") long userId) {
+    @GetMapping("/{userId}")//detail
+    public ApiResponse<UserResponse> getUserById(@PathVariable("userId") long userId) {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.getUserById(userId))
                 .build();
@@ -81,16 +78,30 @@ public class UserController {
     ApiResponse<String> deleteUser(@PathVariable long userId) {
         userService.deleteUser(userId);
         return ApiResponse.<String>builder()
-                .message("Success!")
                 .result("User has been deleted")
                 .build();
     }
 
+    @PutMapping("/change-password")
+    ApiResponse<SimpleUserResponse> changePassword(@RequestBody UserChangePasswordRequest request){
+        return ApiResponse.<SimpleUserResponse>builder()
+                .result(userService.changePassword(request))
+                .build();
+    }
+
     @GetMapping("/search")
-    public ApiResponse<Page<UserResponse>> searchSupplier(
+    public ApiResponse<Page<UserResponse>> searchUsers(
             @RequestParam(defaultValue = "0") int page, @RequestParam String keyword) {
         return ApiResponse.<Page<UserResponse>>builder()
                 .result(userService.searchUser(keyword, page))
                 .build();
     }
+
+    @GetMapping("/me")
+    public ApiResponse<SimpleUserInfoResponse> getMyInfo() {
+        return ApiResponse.<SimpleUserInfoResponse>builder()
+                .result(userService.getMyInfo())
+                .build();
+    }
+
 }

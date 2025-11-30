@@ -92,6 +92,7 @@ public class PurchaseOrderService {
             BigDecimal quantity = BigDecimal.valueOf(itemRequest.getQuantity());
             BigDecimal total = price.multiply(quantity);
             PurchaseOrderItem purchaseOrderItem = PurchaseOrderItem.builder()
+                    .product(variant.getProduct())
                     .productVariant(variant)
                     .purchaseOrder(purchaseOrder)
                     .pricePerUnit(price)
@@ -191,6 +192,7 @@ public class PurchaseOrderService {
             InventoryTransaction inventoryTransaction = InventoryTransaction.builder()
                     .warehouse(purchaseOrder.getWarehouse())
                     .productVariant(variant)
+                    .product(variant.getProduct())
                     .createBy(user)
                     .quantityChange(item.getQuantity())
                     .type(InventoryReferenceType.IMPORT_FROM_SUPPLIER)
@@ -271,6 +273,7 @@ public class PurchaseOrderService {
                 InventoryTransaction inventoryTransaction = InventoryTransaction.builder()
                         .warehouse(purchaseOrder.getWarehouse())
                         .productVariant(variant)
+                        .product(variant.getProduct())
                         .createBy(user)
                         .quantityChange(-item.getQuantity())
                         .type(InventoryReferenceType.CANCEL_IMPORT_ORDER)
@@ -332,6 +335,7 @@ public class PurchaseOrderService {
             default -> throw new AppException(ErrorCode.INVALID_GROUP_BY);
         };
     }
+
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public Page<SimplePurchaseOrderResponse> searchPurchaseOrder(String keyword, int page) {

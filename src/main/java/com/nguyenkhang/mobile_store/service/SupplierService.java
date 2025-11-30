@@ -29,6 +29,7 @@ import lombok.experimental.FieldDefaults;
 public class SupplierService {
     SupplierRepository supplierRepository;
     SupplierMapper supplierMapper;
+    UserService userService;
 
     UserRepository userRepository;
 
@@ -37,9 +38,8 @@ public class SupplierService {
         if (supplierRepository.existsByPhoneNumber(request.getPhoneNumber())) {
             throw new AppException(ErrorCode.PHONE_NUMBER_EXISTED);
         }
-        String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        User userCreate =
-                userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        User userCreate = userService.getCurrentUser();
 
         var supplier = supplierMapper.toSupplier(request);
         supplier.setCreateBy(userCreate);
@@ -59,8 +59,8 @@ public class SupplierService {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public SupplierResponse update(long id, SupplierRequest request) {
 
-        String name = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        User user  = userService.getCurrentUser();
 
         var supplier =
                 supplierRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.SUPPLIER_NOT_EXISTED));

@@ -18,7 +18,7 @@ public class InventoryResponse {
 
     Long id;
 
-    WarehouseResponse warehouse;
+    SimpleWarehouseResponse warehouse;
 
     SimpleProductVariantResponse productVariant;
 

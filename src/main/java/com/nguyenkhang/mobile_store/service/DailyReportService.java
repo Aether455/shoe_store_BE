@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.nguyenkhang.mobile_store.dto.request.DailyReportCriteria;
+import com.nguyenkhang.mobile_store.specification.DailyReportSpecification;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -92,6 +94,16 @@ public class DailyReportService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
 
         var dailyReports = dailyReportRepository.findAll(pageable);
+
+        return dailyReports.map(dailyReportMapper::toDailyReportResponse);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
+    public Page<DailyReportResponse> filter(int page, int size, String sortBy, DailyReportCriteria criteria) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+
+        var spec = DailyReportSpecification.createSpecification(criteria);
+        var dailyReports = dailyReportRepository.findAll(spec, pageable);
 
         return dailyReports.map(dailyReportMapper::toDailyReportResponse);
     }

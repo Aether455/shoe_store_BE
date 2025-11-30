@@ -1,5 +1,6 @@
 package com.nguyenkhang.mobile_store.controller;
 
+import com.nguyenkhang.mobile_store.dto.response.vouchers.VoucherResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.data.domain.Page;
@@ -58,6 +59,17 @@ public class WarehouseController {
 
         return ApiResponse.<String>builder()
                 .result("Warehouse has been deleted")
+                .build();
+    }
+
+    @GetMapping("/search")
+    public ApiResponse<Page<WarehouseResponse>> searchWarehouse(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        return ApiResponse.<Page<WarehouseResponse>>builder()
+                .result(warehouseService.searchWarehouse(keyword, page, size))
                 .build();
     }
 }

@@ -2,6 +2,9 @@ package com.nguyenkhang.mobile_store.service;
 
 import java.util.List;
 
+import com.nguyenkhang.mobile_store.exception.AppException;
+import com.nguyenkhang.mobile_store.exception.ErrorCode;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +33,11 @@ public class CategoryService {
     public CategoryResponse create(CategoryCreationRequest request) {
         Category category = categoryMapper.toCategory(request);
 
-        categoryRepository.save(category);
+        try {
+            categoryRepository.save(category);
+        } catch (DataIntegrityViolationException e) {
+            throw new AppException(ErrorCode.CATEGORY_EXISTED);
+        }
         return categoryMapper.toCategoryResponse(category);
     }
 
@@ -51,7 +58,7 @@ public class CategoryService {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public CategoryResponse update(long id, CategoryUpdateRequest request) {
         Category category =
-                categoryRepository.findById(id).orElseThrow(() -> new RuntimeException("Category not existed!"));
+                categoryRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));
 
         categoryMapper.updateCategory(category, request);
 

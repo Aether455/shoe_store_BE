@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.nguyenkhang.mobile_store.dto.response.user.SimpleUserResponse;
 
+import com.nguyenkhang.mobile_store.enums.PurchaseOrderStatus;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -17,10 +18,11 @@ public class SimplePurchaseOrderResponse {
 
     Long id;
 
-    SupplierResponse supplier;
+    SimpleSupplierResponse supplier;
 
-    WarehouseResponse warehouse;
+    SimpleWarehouseResponse warehouse;
 
+    PurchaseOrderStatus status;
     double totalAmount;
 
     SimpleUserResponse createBy;

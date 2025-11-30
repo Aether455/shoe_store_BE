@@ -15,10 +15,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderCreationRequest {
-
-    long userId;
-    long customerId;
-
     @NotBlank(message = "PHONE_NUMBER_REQUIRED")
     @Pattern(regexp = "^(0|\\+84)(\\d{9})$", message = "INVALID_PHONE_NUMBER")
     String phoneNumber;

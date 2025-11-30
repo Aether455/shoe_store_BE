@@ -3,6 +3,7 @@ package com.nguyenkhang.mobile_store.controller;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.nguyenkhang.mobile_store.dto.request.DailyReportCriteria;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +40,16 @@ public class StatisticController {
             @RequestParam(defaultValue = "id") String sortBy) {
         return ApiResponse.<Page<DailyReportResponse>>builder()
                 .result(dailyReportService.get(page, size, sortBy))
+                .build();
+    }
+    @GetMapping("/daily-reports/filter")
+    public ApiResponse<Page<DailyReportResponse>> filter(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            DailyReportCriteria criteria) {
+        return ApiResponse.<Page<DailyReportResponse>>builder()
+                .result(dailyReportService.filter(page, size, sortBy,criteria))
                 .build();
     }
 

@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.nguyenkhang.mobile_store.dto.request.products.ProductSearchCriteria;
 import com.nguyenkhang.mobile_store.dto.response.product.*;
 import com.nguyenkhang.mobile_store.repository.*;
 import com.nguyenkhang.mobile_store.repository.ProductDocumentRepository;
@@ -186,6 +187,7 @@ public class ProductService {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public Page<SimpleProductResponse> getProducts(int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+
 
         var products = productRepository.findAll(pageable);
 

@@ -21,6 +21,10 @@ public class WarehouseResponse {
     String address;
 
     String description;
+    int priority;
+    String province;
+    String district;
+    String ward;
 
     SimpleUserResponse createBy;
 

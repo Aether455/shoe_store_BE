@@ -52,10 +52,8 @@ public class CustomerService {
         if (customerRepository.existsByPhoneNumber(request.getPhoneNumber())) {
             throw new AppException(ErrorCode.PHONE_NUMBER_EXISTED);
         }
-        var context = SecurityContextHolder.getContext();
-        String name = context.getAuthentication().getName();
-        User userCreate =
-                userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+
+        User userCreate =userService.getCurrentUser();
 
         var customer = customerMapper.toCustomer(request);
 
@@ -134,6 +132,7 @@ public class CustomerService {
         return customerMapper.toCustomerResponseForUser(customer);
     }
 
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public Page<CustomerResponse> searchCustomers(String keyword, int page) {
         Pageable pageable = PageRequest.of(page, 20);
         return customerRepository

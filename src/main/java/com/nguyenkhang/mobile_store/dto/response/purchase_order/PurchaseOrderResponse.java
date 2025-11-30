@@ -3,6 +3,8 @@ package com.nguyenkhang.mobile_store.dto.response.purchase_order;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.nguyenkhang.mobile_store.dto.response.SimpleSupplierResponse;
+import com.nguyenkhang.mobile_store.dto.response.SimpleWarehouseResponse;
 import com.nguyenkhang.mobile_store.dto.response.SupplierResponse;
 import com.nguyenkhang.mobile_store.dto.response.WarehouseResponse;
 import com.nguyenkhang.mobile_store.dto.response.user.SimpleUserResponse;
@@ -21,9 +23,9 @@ public class PurchaseOrderResponse {
 
     Long id;
 
-    SupplierResponse supplier;
+    SimpleSupplierResponse supplier;
 
-    WarehouseResponse warehouse;
+    SimpleWarehouseResponse warehouse;
 
     List<PurchaseOrderItemResponse> purchaseOrderItems;
 
@@ -32,6 +34,9 @@ public class PurchaseOrderResponse {
     double totalAmount;
 
     SimpleUserResponse createBy;
+    SimpleUserResponse updateBy;
 
     LocalDateTime createAt;
+    LocalDateTime updateAt;
+
 }

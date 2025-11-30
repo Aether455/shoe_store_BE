@@ -6,6 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -54,10 +55,11 @@ public class VoucherService {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
-    public List<VoucherResponse> getVouchers() {
-        List<Voucher> voucherList = voucherRepository.findAll();
+    public Page<VoucherResponse> getVouchers(int page, int size, String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
+        Page<Voucher> vouchers = voucherRepository.findAll(pageable);
 
-        return voucherList.stream().map((voucherMapper::toVoucherResponse)).toList();
+        return vouchers.map((voucherMapper::toVoucherResponse));
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
@@ -68,7 +70,7 @@ public class VoucherService {
 
         return voucherMapper.toVoucherResponse(voucher);
     }
-
+    // dành cho khi tạo đơn hàng mới call
     public VoucherResponseForCustomer findByVoucherCode(String voucherCode) {
         Voucher voucher = voucherRepository
                 .findByVoucherCode(voucherCode)

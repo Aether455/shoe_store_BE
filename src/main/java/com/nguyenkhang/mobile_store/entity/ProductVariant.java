@@ -67,5 +67,6 @@ public class ProductVariant {
     String signature;
 
     @Version
-    Long version;
+    @Column(columnDefinition = "bigint default 0")
+    Long version = 0L;
 }

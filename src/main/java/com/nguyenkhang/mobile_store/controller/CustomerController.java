@@ -58,7 +58,7 @@ public class CustomerController {
                 .build();
     }
 
-    @PutMapping("/current_user")
+    @PutMapping("/current_user")//bỏ qua
     public ApiResponse<CustomerResponseForUser> updateByCurrentUser(@RequestBody @Valid CustomerUpdateRequest request) {
         return ApiResponse.<CustomerResponseForUser>builder()
                 .message("Success!")
@@ -83,7 +83,7 @@ public class CustomerController {
                 .build();
     }
 
-    @GetMapping("/me")
+    @GetMapping("/me")//bỏ qua
     public ApiResponse<CustomerResponseForUser> getCustomerByCurrentUser() {
         return ApiResponse.<CustomerResponseForUser>builder()
                 .result(customerService.getCustomerByCurrentUser())

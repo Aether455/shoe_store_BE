@@ -26,7 +26,21 @@ public class ApplicationInitConfig {
 
     @Bean
     ApplicationRunner applicationRunner(UserRepository userRepository, RoleRepository roleRepository) {
+
+
         return args -> {
+            for (Role roleEnum:Role.values()){
+                String roleName = roleEnum.name();
+                if(!roleRepository.existsById(roleName)){
+                    var role = com.nguyenkhang.mobile_store.entity.Role.builder()
+                            .name(roleName)
+                            .description("Default description for " + roleName)
+                            .build();
+
+                    roleRepository.save(role);
+                    log.info("Role {} has been initialized.", roleName);
+                }
+            }
             if (userRepository.findByUsername("admin").isEmpty()) {
                 var roles = new HashSet<String>();
                 roles.add(Role.ADMIN.name());
@@ -43,6 +57,9 @@ public class ApplicationInitConfig {
                 log.warn(
                         "Admin user has been created with default password: admin and email: admin@gmail.com, please change it!");
             }
+
+
+
         };
     }
 }
