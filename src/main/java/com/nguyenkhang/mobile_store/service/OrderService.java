@@ -351,8 +351,8 @@ public class OrderService {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
-    public Page<SimpleOrderResponse> getOrders(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<SimpleOrderResponse> getOrders(int page, int size, String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
         var order = orderRepository.findAll(pageable);
 
         return order.map(orderMapper::toSimpleOrderResponse);
@@ -396,6 +396,10 @@ public class OrderService {
 
         if (order.getStatus().name().equals(OrderStatus.CANCELLED.name())) {
             throw new AppException(ErrorCode.ORDER_ALREADY_CANCELED);
+        }
+
+        if (order.getStatus().equals(request.getOrderStatus())){
+            throw new AppException(ErrorCode.DUPLICATE_ORDER_STATUS);
         }
 
         OrderStatusHistory history = OrderStatusHistory.builder()

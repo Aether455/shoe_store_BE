@@ -35,9 +35,10 @@ public class OrderController {
     @GetMapping
     public ApiResponse<Page<SimpleOrderResponse>> getOrders(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy) {
         return ApiResponse.<Page<SimpleOrderResponse>>builder()
-                .result(orderService.getOrders(page, size ))
+                .result(orderService.getOrders(page, size, sortBy))
                 .build();
     }
 
@@ -65,9 +66,9 @@ public class OrderController {
 
     @GetMapping("/search")
     public ApiResponse<Page<SimpleOrderResponse>> searchOrders(
-            @RequestParam(defaultValue = "0") int page, @RequestParam String keyword,   @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "0") int page, @RequestParam String keyword, @RequestParam(defaultValue = "10") int size) {
         return ApiResponse.<Page<SimpleOrderResponse>>builder()
-                .result(orderService.searchOrders(keyword, page,size))
+                .result(orderService.searchOrders(keyword, page, size))
                 .build();
     }
 }

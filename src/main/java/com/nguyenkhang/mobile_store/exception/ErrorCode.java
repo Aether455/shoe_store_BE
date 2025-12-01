@@ -127,6 +127,8 @@ public enum ErrorCode {
     ORDER_CANCEL_STATUS_INVALID(6885, "Order can only be canceled when status is PENDING!", HttpStatus.BAD_REQUEST),
 
     ORDER_ALREADY_CANCELED(6885, "Order has already been canceled!", HttpStatus.BAD_REQUEST),
+    DUPLICATE_ORDER_STATUS(4574, "Cannot update duplicate status!", HttpStatus.BAD_REQUEST),
+
 
     INSUFFICIENT_STOCK(6346, "Insufficient inventory! ", HttpStatus.BAD_REQUEST),
     ORDER_COORDINATES_MISSING(6885, "Missing delivery coordinates!", HttpStatus.BAD_REQUEST),

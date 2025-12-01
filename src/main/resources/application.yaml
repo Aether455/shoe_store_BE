@@ -3,7 +3,6 @@ server:
   servlet:
     context-path: /api
 
-
 spring:
   datasource:
     url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/store_db}
