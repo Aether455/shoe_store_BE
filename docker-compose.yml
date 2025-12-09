@@ -1,25 +1,27 @@
 version: '3.8'
 
 services:
-  # MySQL
-  mysqldb:
+  # 1. Database Service
+  mysqldb:  # <-- Tên này được dùng làm host trong chuỗi kết nối
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      # Lấy giá trị từ file .env để tạo DB lần đầu
+      MYSQL_DATABASE: ${MYSQL_DB_NAME}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - db_data:/var/lib/mysql
     networks:
       - app-network
     command: --default-authentication-plugin=mysql_native_password
 
-  # Elasticsearch
+  # 2. Elasticsearch Service
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.17.10
     environment:
       - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms1g -Xmx1g" # Server 8GB RAM nên cho ES hẳn 1GB
+      # Giới hạn RAM để tránh sập server (quan trọng cho cả máy local và AWS)
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - xpack.security.enabled=false
     volumes:
       - es_data:/usr/share/elasticsearch/data
@@ -28,20 +30,16 @@ services:
     ports:
       - "9200:9200"
 
-  # Spring Boot App
+  # 3. Backend App Service
   backend:
     build: .
-    restart: always
+    restart: always # Tự khởi động lại nếu MySQL chưa sẵn sàng
     depends_on:
       - mysqldb
       - elasticsearch
-    env_file: .env
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb:3306/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      # Cấu hình host ES trỏ vào tên service
-      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
+    # 👇 Dòng này quan trọng: Load toàn bộ biến từ .env vào App
+    env_file:
+      - .env
     ports:
       - "8080:8080"
     networks:
