@@ -4,11 +4,14 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.*;
 
-import com.nguyenkhang.mobile_store.dto.ApiResponse;
+import com.nguyenkhang.mobile_store.annotations.ApiCommonResponses;
+import com.nguyenkhang.mobile_store.dto.ApiResponseDTO;
 import com.nguyenkhang.mobile_store.dto.request.BrandRequest;
 import com.nguyenkhang.mobile_store.dto.response.brand.BrandResponse;
 import com.nguyenkhang.mobile_store.service.BrandService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,41 +20,44 @@ import lombok.experimental.FieldDefaults;
 @RequestMapping("/brands")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Tag(name = "Brand", description = "Quản lý thương hiệu")
 public class BrandController {
 
     BrandService brandService;
 
+    @ApiCommonResponses
+    @Operation(summary = "Thêm mới")
     @PostMapping
-    public ApiResponse<BrandResponse> createBrand(@RequestBody BrandRequest request) {
+    public ApiResponseDTO<BrandResponse> createBrand(@RequestBody BrandRequest request) {
 
-        return ApiResponse.<BrandResponse>builder()
+        return ApiResponseDTO.<BrandResponse>builder()
                 .result(brandService.createBrand(request))
-                .message("Success!")
                 .build();
     }
 
+    @ApiCommonResponses
+    @Operation(summary = "Lấy tất cả")
     @GetMapping
-    public ApiResponse<List<BrandResponse>> getBrands() {
-        return ApiResponse.<List<BrandResponse>>builder()
+    public ApiResponseDTO<List<BrandResponse>> getBrands() {
+        return ApiResponseDTO.<List<BrandResponse>>builder()
                 .result(brandService.getBrands())
                 .build();
     }
 
+    @ApiCommonResponses
+    @Operation(summary = "Update")
     @PutMapping("/{brandId}")
-    public ApiResponse<BrandResponse> updateBrand(@RequestBody BrandRequest request, @PathVariable long brandId) {
+    public ApiResponseDTO<BrandResponse> updateBrand(@RequestBody BrandRequest request, @PathVariable long brandId) {
 
-        return ApiResponse.<BrandResponse>builder()
+        return ApiResponseDTO.<BrandResponse>builder()
                 .result(brandService.updateBrand(brandId, request))
-                .message("Success!")
                 .build();
     }
 
+    @Operation(summary = "Xóa")
     @DeleteMapping("/{brandId}")
-    ApiResponse<String> delete(@PathVariable long brandId) {
+    ApiResponseDTO<String> delete(@PathVariable long brandId) {
         brandService.delete(brandId);
-        return ApiResponse.<String>builder()
-                .message("Success!")
-                .result("Brand has been deleted")
-                .build();
+        return ApiResponseDTO.<String>builder().result("Brand has been deleted").build();
     }
 }
