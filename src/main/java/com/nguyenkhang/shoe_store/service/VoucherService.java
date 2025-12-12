@@ -101,7 +101,7 @@ public class VoucherService {
         try {
             voucherRepository.delete(voucher);
             entityManager.flush();
-        } catch (DataIntegrityViolationException e) {
+        } catch (ConstraintViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_VOUCHER_LINKED_ORDER);
         }
     }

@@ -73,8 +73,8 @@ public class BrandService {
         try {
             brandRepository.delete(brand);
             entityManager.flush();
-        } catch (DataIntegrityViolationException e) {
-            throw new AppException(ErrorCode.CANNOT_DELETE_CATEGORY);
+        } catch (ConstraintViolationException e) {
+            throw new AppException(ErrorCode.CANNOT_DELETE_BRAND);
         }
     }
 }

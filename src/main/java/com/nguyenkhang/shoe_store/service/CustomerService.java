@@ -41,9 +41,7 @@ public class CustomerService {
 
     CustomerMapper customerMapper;
     CustomerRepository customerRepository;
-    AddressService addressService;
     AddressMapper addressMapper;
-    UserRepository userRepository;
 
     UserService userService;
 
@@ -163,14 +161,10 @@ public class CustomerService {
         return customerMapper.toCustomerResponseForUser(customer);
     }
 
-    @Transactional(rollbackFor = ConstraintViolationException.class)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long id) {
-        Customer customer =
-                customerRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_NOT_EXISTED));
         try {
-            customerRepository.delete(customer);
-            entityManager.flush();
+            customerRepository.deleteStaffByIdCustom(id);
         } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_CUSTOMER);
         }

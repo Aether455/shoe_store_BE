@@ -44,7 +44,6 @@ public class CustomerController {
     @GetMapping("/{id}")
     public ApiResponseDTO<CustomerResponse> getById(@PathVariable long id) {
         return ApiResponseDTO.<CustomerResponse>builder()
-                .message("Success!")
                 .result(customerService.getById(id))
                 .build();
     }
@@ -53,7 +52,6 @@ public class CustomerController {
     public ApiResponseDTO<CustomerResponse> update(
             @PathVariable long id, @RequestBody @Valid CustomerUpdateRequest request) {
         return ApiResponseDTO.<CustomerResponse>builder()
-                .message("Success!")
                 .result(customerService.update(id, request))
                 .build();
     }
@@ -62,7 +60,6 @@ public class CustomerController {
     public ApiResponseDTO<CustomerResponseForUser> updateByCurrentUser(
             @RequestBody @Valid CustomerUpdateRequest request) {
         return ApiResponseDTO.<CustomerResponseForUser>builder()
-                .message("Success!")
                 .result(customerService.updateByCurrentUser(request))
                 .build();
     }
@@ -71,8 +68,7 @@ public class CustomerController {
     public ApiResponseDTO<String> delete(@PathVariable long id) {
         customerService.delete(id);
         return ApiResponseDTO.<String>builder()
-                .message("Success!")
-                .result("Size has been deleted")
+                .result("Customer has been deleted")
                 .build();
     }
 

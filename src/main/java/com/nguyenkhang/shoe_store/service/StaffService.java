@@ -94,7 +94,6 @@ public class StaffService {
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long staffId) {
-
         try {
             staffRepository.deleteStaffByIdCustom(staffId);
         } catch (DataIntegrityViolationException e) {

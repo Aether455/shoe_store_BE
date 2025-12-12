@@ -80,7 +80,7 @@ public class OptionService {
         try {
             optionRepository.delete(option);
             entityManager.flush();
-        } catch (DataIntegrityViolationException e) {
+        } catch (ConstraintViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_OPTION);
         }
     }

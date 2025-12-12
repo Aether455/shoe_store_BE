@@ -75,7 +75,7 @@ public class OptionValueService {
         try {
             optionValueRepository.delete(value);
             entityManager.flush();
-        } catch (DataIntegrityViolationException e) {
+        } catch (ConstraintViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_OPTION_VALUE);
         }
     }

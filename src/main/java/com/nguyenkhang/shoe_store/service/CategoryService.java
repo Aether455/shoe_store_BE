@@ -78,7 +78,7 @@ public class CategoryService {
 
             categoryRepository.delete(category);
             entityManager.flush();
-        } catch (DataIntegrityViolationException e) {
+        } catch (ConstraintViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_CATEGORY);
         }
     }

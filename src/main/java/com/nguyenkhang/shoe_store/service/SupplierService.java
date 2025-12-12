@@ -85,11 +85,11 @@ public class SupplierService {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long id) {
         var supplier =
-                supplierRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.SUPPLIER_NOT_EXISTED));
+                supplierRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.SUPPLIER_NOT_EXISTED));supplierRepository.delete(supplier);
         try {
-            supplierRepository.delete(supplier);
+
             entityManager.flush();
-        } catch (DataIntegrityViolationException exception) {
+        } catch (ConstraintViolationException exception) {
             throw new AppException(ErrorCode.CANNOT_DELETE_SUPPLIER_LINKED_PURCHASE_ORDER);
         }
     }
