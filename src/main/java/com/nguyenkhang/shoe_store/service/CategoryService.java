@@ -30,7 +30,6 @@ import lombok.experimental.FieldDefaults;
 public class CategoryService {
     CategoryRepository categoryRepository;
     CategoryMapper categoryMapper;
-    EntityManager entityManager;
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
@@ -69,7 +68,7 @@ public class CategoryService {
         return categoryMapper.toCategoryResponse(categoryRepository.save(category));
     }
 
-    @Transactional(rollbackFor = ConstraintViolationException.class)
+    @Transactional
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long id) {
         Category category =
@@ -77,8 +76,8 @@ public class CategoryService {
         try {
 
             categoryRepository.delete(category);
-            entityManager.flush();
-        } catch (ConstraintViolationException e) {
+            categoryRepository.flush();
+        } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_CATEGORY);
         }
     }

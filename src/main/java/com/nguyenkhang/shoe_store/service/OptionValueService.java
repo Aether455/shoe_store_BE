@@ -33,7 +33,6 @@ public class OptionValueService {
     OptionValueRepository optionValueRepository;
     UserRepository userRepository;
     OptionRepository optionRepository;
-    EntityManager entityManager;
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
@@ -66,7 +65,7 @@ public class OptionValueService {
                 .toList();
     }
 
-    @Transactional(rollbackFor = ConstraintViolationException.class)
+    @Transactional
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long id) {
         var value = optionValueRepository
@@ -74,8 +73,8 @@ public class OptionValueService {
                 .orElseThrow(() -> new AppException(ErrorCode.OPTION_VALUE_NOT_EXISTED));
         try {
             optionValueRepository.delete(value);
-            entityManager.flush();
-        } catch (ConstraintViolationException e) {
+            optionValueRepository.flush();
+        } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_OPTION_VALUE);
         }
     }

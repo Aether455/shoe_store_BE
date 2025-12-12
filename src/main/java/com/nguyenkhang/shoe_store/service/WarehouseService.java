@@ -40,8 +40,6 @@ public class WarehouseService {
 
     UserService userService;
     GeocodingService geocodingService;
-    EntityManager entityManager;
-
     @Transactional
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public WarehouseResponse create(WarehouseRequest request) {
@@ -111,15 +109,15 @@ public class WarehouseService {
         return warehouseMapper.toWarehouseResponse(warehouse);
     }
 
-    @Transactional(rollbackFor = ConstraintViolationException.class)
+    @Transactional
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long id) {
         var warehouse =
                 warehouseRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.WAREHOUSE_NOT_EXISTED));
         try {
             warehouseRepository.delete(warehouse);
-            entityManager.flush();
-        } catch (ConstraintViolationException e) {
+            warehouseRepository.flush();
+        } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_WAREHOUSE);
         }
     }

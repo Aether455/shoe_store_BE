@@ -30,7 +30,6 @@ public class BrandService {
 
     BrandMapper brandMapper;
     BrandRepository brandRepository;
-    EntityManager entityManager;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public BrandResponse createBrand(BrandRequest request) {
@@ -65,15 +64,15 @@ public class BrandService {
         return brandMapper.toBrandResponse(brand);
     }
 
-    @Transactional(rollbackFor = ConstraintViolationException.class)
+    @Transactional
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long id) {
         Brand brand = brandRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_EXISTED));
 
         try {
             brandRepository.delete(brand);
-            entityManager.flush();
-        } catch (ConstraintViolationException e) {
+            brandRepository.flush();
+        } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_BRAND);
         }
     }

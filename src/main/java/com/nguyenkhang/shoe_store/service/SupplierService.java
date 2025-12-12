@@ -32,7 +32,6 @@ public class SupplierService {
     SupplierRepository supplierRepository;
     SupplierMapper supplierMapper;
     UserService userService;
-    EntityManager entityManager;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public SupplierResponse create(SupplierRequest request) {
@@ -81,15 +80,15 @@ public class SupplierService {
         return supplierMapper.toSupplierResponse(supplier);
     }
 
-    @Transactional(rollbackFor = ConstraintViolationException.class)
+    @Transactional
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long id) {
         var supplier =
-                supplierRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.SUPPLIER_NOT_EXISTED));supplierRepository.delete(supplier);
+                supplierRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.SUPPLIER_NOT_EXISTED));
         try {
-
-            entityManager.flush();
-        } catch (ConstraintViolationException exception) {
+            supplierRepository.delete(supplier);
+            supplierRepository.flush();
+        } catch (DataIntegrityViolationException exception) {
             throw new AppException(ErrorCode.CANNOT_DELETE_SUPPLIER_LINKED_PURCHASE_ORDER);
         }
     }

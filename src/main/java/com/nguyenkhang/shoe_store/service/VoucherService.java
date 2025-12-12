@@ -92,7 +92,6 @@ public class VoucherService {
         return voucherMapper.toVoucherResponse(voucher);
     }
 
-    @Transactional(rollbackFor = ConstraintViolationException.class)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long voucherId) {
         Voucher voucher = voucherRepository
@@ -100,8 +99,8 @@ public class VoucherService {
                 .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_EXISTED));
         try {
             voucherRepository.delete(voucher);
-            entityManager.flush();
-        } catch (ConstraintViolationException e) {
+            voucherRepository.flush();
+        } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_VOUCHER_LINKED_ORDER);
         }
     }

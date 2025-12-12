@@ -72,15 +72,15 @@ public class OptionService {
         return optionMapper.toOptionResponse(option);
     }
 
-    @Transactional(rollbackFor = ConstraintViolationException.class)
+    @Transactional
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long id) {
         var option = optionRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.OPTION_NOT_EXISTED));
 
         try {
             optionRepository.delete(option);
-            entityManager.flush();
-        } catch (ConstraintViolationException e) {
+            optionRepository.flush();
+        } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_OPTION);
         }
     }
