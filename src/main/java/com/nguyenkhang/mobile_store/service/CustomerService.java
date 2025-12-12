@@ -3,6 +3,9 @@ package com.nguyenkhang.mobile_store.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.EntityManager;
+
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,6 +46,8 @@ public class CustomerService {
     UserRepository userRepository;
 
     UserService userService;
+
+    EntityManager entityManager;
 
     // admin & nv
     @Transactional
@@ -158,11 +163,14 @@ public class CustomerService {
         return customerMapper.toCustomerResponseForUser(customer);
     }
 
+    @Transactional(rollbackFor = ConstraintViolationException.class)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long id) {
-
+        Customer customer =
+                customerRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CUSTOMER_NOT_EXISTED));
         try {
-            customerRepository.deleteById(id);
+            customerRepository.delete(customer);
+            entityManager.flush();
         } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_CUSTOMER);
         }

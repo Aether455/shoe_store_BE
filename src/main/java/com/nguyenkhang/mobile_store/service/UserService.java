@@ -170,8 +170,9 @@ public class UserService {
     public void deleteUser(long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        userRepository.delete(user);
+
         try {
+            userRepository.delete(user);
             entityManager.flush();
         } catch (ConstraintViolationException e) {
             throw new AppException(ErrorCode.USER_CAN_NOT_DELETE);

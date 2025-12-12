@@ -2,6 +2,8 @@ package com.nguyenkhang.mobile_store.service;
 
 import java.util.List;
 
+import jakarta.persistence.EntityManager;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import com.nguyenkhang.mobile_store.repository.BrandRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +29,7 @@ public class BrandService {
 
     BrandMapper brandMapper;
     BrandRepository brandRepository;
+    EntityManager entityManager;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public BrandResponse createBrand(BrandRequest request) {
@@ -60,11 +64,14 @@ public class BrandService {
         return brandMapper.toBrandResponse(brand);
     }
 
+    @Transactional(rollbackFor = ConstraintViolationException.class)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long id) {
-        try {
-            brandRepository.deleteById(id);
+        Brand brand = brandRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_EXISTED));
 
+        try {
+            brandRepository.delete(brand);
+            entityManager.flush();
         } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_CATEGORY);
         }

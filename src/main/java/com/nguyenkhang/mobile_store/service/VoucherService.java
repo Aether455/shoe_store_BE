@@ -1,5 +1,7 @@
 package com.nguyenkhang.mobile_store.service;
 
+import jakarta.persistence.EntityManager;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,14 +34,14 @@ import lombok.experimental.FieldDefaults;
 public class VoucherService {
     VoucherRepository voucherRepository;
     VoucherMapper voucherMapper;
-    UserRepository userRepository;
+    UserService userService;
+    EntityManager entityManager;
+
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public VoucherResponse create(VoucherRequest request) {
-        var context = SecurityContextHolder.getContext();
-        String name = context.getAuthentication().getName();
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userService.getCurrentUser();
 
         Voucher voucher = voucherMapper.toVoucher(request);
         voucher.setCreateBy(user);
@@ -79,9 +81,7 @@ public class VoucherService {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public VoucherResponse updateVoucher(long voucherId, VoucherRequest request) {
-        var context = SecurityContextHolder.getContext();
-        String name = context.getAuthentication().getName();
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        User user = userService.getCurrentUser();
 
         Voucher voucher = voucherRepository
                 .findById(voucherId)
@@ -94,10 +94,15 @@ public class VoucherService {
         return voucherMapper.toVoucherResponse(voucher);
     }
 
+    @Transactional(rollbackFor = ConstraintViolationException.class)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long voucherId) {
+        Voucher voucher = voucherRepository
+                .findById(voucherId)
+                .orElseThrow(() -> new AppException(ErrorCode.VOUCHER_NOT_EXISTED));
         try {
-            voucherRepository.deleteById(voucherId);
+            voucherRepository.delete(voucher);
+            entityManager.flush();
         } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_VOUCHER_LINKED_ORDER);
         }

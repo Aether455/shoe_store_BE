@@ -1,5 +1,7 @@
 package com.nguyenkhang.mobile_store.service;
 
+import jakarta.persistence.EntityManager;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +23,7 @@ import com.nguyenkhang.mobile_store.specification.SupplierSpecification;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +32,7 @@ public class SupplierService {
     SupplierRepository supplierRepository;
     SupplierMapper supplierMapper;
     UserService userService;
-
-    UserRepository userRepository;
+    EntityManager entityManager;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public SupplierResponse create(SupplierRequest request) {
@@ -79,10 +81,14 @@ public class SupplierService {
         return supplierMapper.toSupplierResponse(supplier);
     }
 
+    @Transactional(rollbackFor = ConstraintViolationException.class)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long id) {
+        var supplier =
+                supplierRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.SUPPLIER_NOT_EXISTED));
         try {
-            supplierRepository.deleteById(id);
+            supplierRepository.delete(supplier);
+            entityManager.flush();
         } catch (DataIntegrityViolationException exception) {
             throw new AppException(ErrorCode.CANNOT_DELETE_SUPPLIER_LINKED_PURCHASE_ORDER);
         }

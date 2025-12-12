@@ -358,6 +358,7 @@ public class OrderService {
 
         return orderMapper.toOrderResponse(order);
     }
+
     @Transactional
     public OrderResponse completeOrder(long id) {
         var order = orderRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_EXIST));
@@ -386,6 +387,7 @@ public class OrderService {
 
         return orderMapper.toOrderResponse(order);
     }
+
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
     public Page<SimpleOrderResponse> getOrders(int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());

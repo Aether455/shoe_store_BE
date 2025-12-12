@@ -149,7 +149,8 @@ public enum ErrorCode {
     ORDER_COORDINATES_MISSING(4110, "Thiếu tọa độ giao hàng!", HttpStatus.BAD_REQUEST),
     RECEIVER_NAME_REQUIRED(4111, "Tên người nhận là bắt buộc!", HttpStatus.BAD_REQUEST),
     ORDER_ALREADY_COMPLETED(4112, "Đơn hàng đã hoàn thành. Không thể cập nhật!", HttpStatus.BAD_REQUEST),
-    INVALID_STATUS_TRANSITION(4113, "Trạng thái đơn hàng hiện tại không cho phép thực hiện thay đổi này!", HttpStatus.BAD_REQUEST),
+    INVALID_STATUS_TRANSITION(
+            4113, "Trạng thái đơn hàng hiện tại không cho phép thực hiện thay đổi này!", HttpStatus.BAD_REQUEST),
     ORDER_COMPLETED_STATUS_INVALID(
             4114, "Chỉ có thể bấm hoàn thành khi trạng thái là DELIVERED (Đã giao)!", HttpStatus.BAD_REQUEST),
     // Payment

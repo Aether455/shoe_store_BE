@@ -2,6 +2,8 @@ package com.nguyenkhang.mobile_store.service;
 
 import java.util.List;
 
+import jakarta.persistence.EntityManager;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,6 +32,7 @@ public class OptionValueService {
     OptionValueRepository optionValueRepository;
     UserRepository userRepository;
     OptionRepository optionRepository;
+    EntityManager entityManager;
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
@@ -61,12 +64,13 @@ public class OptionValueService {
                 .map(optionValueMapper::toOptionValueResponse)
                 .toList();
     }
-
+    @Transactional(rollbackFor = ConstraintViolationException.class)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long id) {
-
+        var value = optionValueRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.OPTION_VALUE_NOT_EXISTED));
         try {
-            optionValueRepository.deleteById(id);
+            optionValueRepository.delete(value);
+            entityManager.flush();
         } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_OPTION_VALUE);
         }

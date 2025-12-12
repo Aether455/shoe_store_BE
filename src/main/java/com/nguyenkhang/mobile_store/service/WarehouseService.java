@@ -1,5 +1,7 @@
 package com.nguyenkhang.mobile_store.service;
 
+import jakarta.persistence.EntityManager;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,6 +39,7 @@ public class WarehouseService {
 
     UserService userService;
     GeocodingService geocodingService;
+    EntityManager entityManager;
 
     @Transactional
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_USER')")
@@ -106,12 +109,14 @@ public class WarehouseService {
                 warehouseRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.WAREHOUSE_NOT_EXISTED));
         return warehouseMapper.toWarehouseResponse(warehouse);
     }
-
+    @Transactional(rollbackFor = ConstraintViolationException.class)
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public void delete(long id) {
-        warehouseRepository.deleteById(id);
+        var warehouse =
+                warehouseRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.WAREHOUSE_NOT_EXISTED));
         try {
-            warehouseRepository.deleteById(id);
+            warehouseRepository.delete(warehouse);
+            entityManager.flush();
         } catch (DataIntegrityViolationException e) {
             throw new AppException(ErrorCode.CANNOT_DELETE_WAREHOUSE);
         }
